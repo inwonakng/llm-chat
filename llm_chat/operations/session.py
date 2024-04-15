@@ -1,0 +1,9 @@
+def new_session():
+
+    ...
+
+def load_session():
+    ...
+
+def save_session():
+    ...
