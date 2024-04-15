@@ -10,16 +10,6 @@ from .paths import CONFIG_DIR
 
 dotenv.load_dotenv()
 
-help_message = (
-    "Commands:\n"
-    "q, quit: exit application\n"
-    "h, help: view help message\n"
-    "l, load: load session\n"
-    "e, edit: edit history\n"
-    "m, model: edit model configuration\n"
-)
-
-
 def run() -> None:
     config = AppConfig.load(CONFIG_DIR)
     state = AppState(config=config)

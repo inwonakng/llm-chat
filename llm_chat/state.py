@@ -18,7 +18,7 @@ class AppState:
         self.current_model = list(self.config.models.keys())[0]
         self.session = Session(
             model_config = self.config.models[self.current_model],
-            system_prompt = self.config.system_prompts["default"],
+            system_prompt = self.config.system_prompts["default"].content,
             log_dir = self.config.log_dir,
         )
         self.sessions_by_name = {}

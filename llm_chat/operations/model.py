@@ -63,7 +63,9 @@ def add_model(*args, state: AppState) -> None:
         args=args,
     )
 
-    yaml.safe_dump(new_config.json(), open(CONFIG_DIR / f"models/{model_name}.yaml", "w"))
+    yaml.safe_dump(
+        new_config.json(), open(CONFIG_DIR / f"models/{model_name}.yaml", "w")
+    )
 
     state.config.models.append(new_config)
     print(state.config)
@@ -73,7 +75,7 @@ def add_model(*args, state: AppState) -> None:
 def list_model(*args, state: AppState) -> None:
     buffer = "Available models:\n" + "\n\n".join(
         (
-            f"- **{model_config.model_name}**"
+            f"- `{model_config.model_name}`"
             if model_config.model_name == state.current_model
             else f"- {model_config.model_name}"
         )

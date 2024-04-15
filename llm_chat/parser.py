@@ -2,23 +2,29 @@ from rich.markdown import Markdown
 from rich.console import Console
 
 from .state import AppState
-from .operations.model import add_model, list_model, select_model
-from .operations.session import new_session, load_session, save_session
+from .operations.model import (
+    add_model,
+    list_model,
+    select_model,
+)
+from .operations.session import (
+    new_session,
+    load_session,
+    save_session,
+    check_session,
+    list_session,
+)
 from .operations.operation import Operation
 
 TAB = " " * 2
 
 
-def build_help_message(key: str, cursor: dict[str, any] | Operation, depth=0):
+def build_help_message(cursor: dict[str, any] | Operation, key: str = "", depth=0):
     if isinstance(cursor, Operation):
-        return TAB * depth + f"- *{key}*: {cursor.help_text}"
+        return TAB * depth + f"- `{cursor.name}`: {cursor.help_text}"
     else:
-        return (
-            TAB * depth
-            + f"- {key}\n\n"
-            + "\n\n".join(
-                build_help_message(k, v, depth + 1) for k, v in cursor.items()
-            )
+        return (TAB * depth + f"- {key}\n\n" if key else "") + "\n\n".join(
+            build_help_message(v, key=k, depth=depth + 1) for k, v in cursor.items()
         )
 
 
@@ -47,7 +53,7 @@ class Parser:
         self.help_message = Markdown(
             "### LLM Chat Help\n\n"
             + "*press `q` or type `quit` to exit application*\n\n"
-            + build_help_message("**Commands**", self.parse_tree)
+            + build_help_message(self.parse_tree)
         )
 
     def handle(self, user_input):
@@ -59,7 +65,7 @@ class Parser:
             else:
                 cursor = cursor.get(key)
                 if cursor is None:
-                    self.console.print(Markdown("Invalid command: `user_input`"))
+                    self.console.print(Markdown(f"Invalid command: `{user_input}`"))
                     break
 
     def input(self):
@@ -73,7 +79,8 @@ class Parser:
         exit_loop = False
         while not exit_loop:
             user_input = self.input()
-            if not user_input: continue
+            if not user_input:
+                continue
             commands = user_input.split()
             if commands[0] in ["q", "quit"]:
                 exit_loop = True
@@ -91,6 +98,12 @@ def initialize_parser(
     parser.register(["model", "list"], list_model, "Add a new model")
     parser.register(["model", "add"], add_model, "List models")
     parser.register(["model", "select"], select_model, "Select model")
+
+    parser.register(["session", "new"], new_session, "Create a new session")
+    parser.register(["session", "load"], load_session, "Load a session")
+    parser.register(["session", "save"], save_session, "Save a session")
+    parser.register(["session", "check"], check_session, "Check the current session")
+    parser.register(["session", "list"], list_session, "List saved sessions")
 
     parser.prepare_help_message()
 

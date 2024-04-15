@@ -15,6 +15,13 @@ class Message:
     def json(self):
         return {"role": self.role, "content": self.content}
 
+@dataclass
+class History:
+    messages: list[Message]
+
+    def json(self):
+        return [message.json() for message in self.messages]
+
 
 class Session:
     name: str
@@ -32,12 +39,13 @@ class Session:
         self.log_dir = log_dir / "sessions" / self.name
 
     @staticmethod
-    def load(name: str, log_dir: str | Path):
+    def load(log_dir: str | Path):
         log_dir = Path(log_dir)
         messages_dir = log_dir / "messages.yaml"
         model_config_dir = log_dir / "model_config.yaml"
         system_prompt_dir = log_dir / "system_prompt.txt"
         session_name_dir = log_dir / "session_name.txt"
+
         if not log_dir.is_dir():
             raise ValueError(f"Cannot find session saved at: {log_dir}")
         if not messages_dir.is_file():
@@ -70,8 +78,8 @@ class Session:
         with open(self.log_dir / "session_name.txt", "w") as f:
             f.write(self.name)
         with open(self.log_dir / "system_prompt.txt", "w") as f:
-            f.write(self.system_prompt)
+            yaml.safe_dump(self.system_prompt, f)
         with open(self.log_dir / "messages.yaml", "w") as f:
-            yaml.safe_dump([m.json for m in self.messages], f)
+            yaml.safe_dump([m.json() for m in self.messages], f)
         with open(self.log_dir / "model_config.yaml", "w") as f:
             yaml.safe_dump(self.model_config.json(), f)

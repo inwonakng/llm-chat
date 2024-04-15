@@ -27,8 +27,8 @@ class SystemPrompt:
 
     def json(self):
         return {
-            "name": self.name,
-            "content": self.prompt,
+            "prompt_name": self.prompt_name,
+            "content": self.content,
         }
 
 
